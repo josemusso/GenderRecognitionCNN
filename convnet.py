@@ -21,7 +21,7 @@ sess = tf.Session()
 
 # Load dataset
 batch_size = 64
-cifar10 = CIFAR10(batch_size=batch_size, validation_proportion=0.1, test_proportion=0.1, augment_data=True)
+cifar10 = CIFAR10(batch_size=batch_size, validation_proportion=0.1, test_proportion=0.1, augment_data=False)
 
 
 # Model blocks
@@ -67,7 +67,7 @@ SUMMARIES_DIR = PARENT_DIR + 'conv_2_layer_with_dropout'
 
 # Model
 use_convnet = True
-n_conv_layers = 2
+n_conv_layers = 3
 
 n_filters_convs = [32, 64, 128]
 
@@ -152,7 +152,7 @@ with tf.name_scope('loss_function'):
 
 # Optimization
 with tf.name_scope('optimizer'):
-    optimizer = tf.train.RMSPropOptimizer(0.0005)
+    optimizer = tf.train.RMSPropOptimizer(0.00005)              # REDUCIDA 1 MAGNITUD
     grads_vars = optimizer.compute_gradients(cross_entropy)
     optimizer.apply_gradients(grads_vars)
     train_step = optimizer.minimize(cross_entropy)
@@ -202,7 +202,6 @@ def validate():
         })
     return summary, mean_acc, mean_xent
 
-
 def test():
     batches = cifar10.getTestSet(asBatches=True)
     accs = []
@@ -221,6 +220,135 @@ def test():
     return mean_acc, matsum
 
 
+# PARA GENERAR MATRICES DE CONFUSION SEGUN CADA ETNIA
+
+def testrazas():
+    batches = cifar10.getTestSet(asBatches=True)
+    accs0 = []
+    accs1 = []
+    accs2 = []
+    accs3 = []
+    accs4 = []
+
+    matsum0 = np.zeros((2, 2))
+    matsum1 = np.zeros((2, 2))
+    matsum2 = np.zeros((2, 2))
+    matsum3 = np.zeros((2, 2))
+    matsum4 = np.zeros((2, 2))
+
+    mean_acc0 =0
+    mean_acc1 =0
+    mean_acc2 =0
+    mean_acc3 =0
+    mean_acc4 =0
+
+    data0 = []
+    genero0 = []
+    data1 = []
+    genero1 = []
+    data2 = []
+    genero2 = []
+    data3 = []
+    genero3 = []
+    data4 = []
+    genero4 = []
+
+    for batch in batches:
+        data, genero, raza, edad = batch
+
+        '''     
+        blanco = 0
+        negro = 1
+        asiatico = 2
+        indio = 3
+        otro = 4
+        '''
+
+        for i in range(len(raza)):
+            if raza[i] == 0:
+                data0.append(data[i])
+                genero0.append(genero[i])
+            if raza[i] == 1:
+                data1.append(data[i])
+                genero1.append(genero[i])
+            if raza[i] == 2:
+                data2.append(data[i])
+                genero2.append(genero[i])
+            if raza[i] == 3:
+                data3.append(data[i])
+                genero3.append(genero[i])
+            if raza[i] == 4:
+                data4.append(data[i])
+                genero4.append(genero[i])
+
+        if len(data0)>64:
+            acc0, mat0 = sess.run((accuracy, con_mat),
+                                feed_dict={
+                                    model_input: data0[0:64],
+                                    target: genero0[0:64],
+                                    keep_prob: 1.0
+                                })
+            accs0.append(acc0)
+            matsum0 = matsum0 + mat0
+            mean_acc0 = np.array(accs0).mean()
+            data0 = data0[65:len(data0)-1]
+            genero0 = genero0[65:len(genero0)-1]
+
+        if len(data1)>64:
+            acc1, mat1 = sess.run((accuracy, con_mat),
+                                feed_dict={
+                                    model_input: data1[0:64],
+                                    target: genero1[0:64],
+                                    keep_prob: 1.0
+                                })
+            accs1.append(acc1)
+            matsum1 = matsum1 + mat1
+            mean_acc1 = np.array(accs1).mean()
+            data1 = data1[65:len(data1)-1]
+            genero1 = genero1[65:len(genero1)-1]
+
+        if len(data2)>64:
+            acc2, mat2 = sess.run((accuracy, con_mat),
+                                feed_dict={
+                                    model_input: data2[0:64],
+                                    target: genero2[0:64],
+                                    keep_prob: 1.0
+                                })
+            accs2.append(acc2)
+            matsum2 = matsum2 + mat2
+            mean_acc2 = np.array(accs2).mean()
+            data2 = data2[65:len(data2)-1]
+            genero2 = genero2[65:len(genero2)-1]
+
+        if len(data3)>64:
+            acc3, mat3 = sess.run((accuracy, con_mat),
+                                feed_dict={
+                                    model_input: data3[0:64],
+                                    target: genero3[0:64],
+                                    keep_prob: 1.0
+                                })
+            accs3.append(acc3)
+            matsum3 = matsum3 + mat3
+            mean_acc3 = np.array(accs3).mean()
+            data3 = data3[65:len(data3)-1]
+            genero3 = genero3[65:len(genero3)-1]
+
+        if len(data4)>64:
+            acc4, mat4 = sess.run((accuracy, con_mat),
+                                feed_dict={
+                                    model_input: data4[0:64],
+                                    target: genero4[0:64],
+                                    keep_prob: 1.0
+                                })
+            accs4.append(acc4)
+            matsum4 = matsum4 + mat4
+            mean_acc4 = np.array(accs4).mean()
+            data4 = data4[65:len(data4)-1]
+            genero4 = genero4[65:len(genero4)-1]
+
+    return mean_acc0, mean_acc1, mean_acc2, mean_acc3, mean_acc4, matsum0, matsum1, matsum2, matsum3, matsum4
+
+
 # Tensorboard writers
 train_writer = tf.summary.FileWriter(SUMMARIES_DIR + '/train',
                                      sess.graph)
@@ -237,7 +365,7 @@ print("Trainable variables")
 for n in tf.trainable_variables():
     print(n.name)
 if use_convnet:
-    epochs = 4
+    epochs = 30
 else:
     epochs = 50
 
@@ -245,6 +373,15 @@ t_i = time.time()
 n_batches = cifar10.n_batches
 val_acc_vals = []
 test_acc_vals = []
+test_acc_vals0 = []
+test_acc_vals1 = []
+test_acc_vals2 = []
+test_acc_vals3 = []
+test_acc_vals4 = []
+
+hist_loss = [1.0]
+patience_cnt =0
+
 while cifar10.getEpoch() < epochs:
     epoch = cifar10.getEpoch()
     batch, batch_idx = cifar10.nextBatch()
@@ -295,54 +432,63 @@ Valid. acc. %.3f, loss %.3f' % (
         ))
         val_acc_vals.append(validation_accuracy)
         test_accuracy, mat = test()
+
         test_acc_vals.append(test_accuracy)
+
+
+        # IMPLEMENTACION EARLY STOPPING
+
+        hist_loss.append(validation_loss)
+        patience = 5
+        min_delta = 0.001
+
+        if epoch > 0 and hist_loss[epoch - 1] - hist_loss[epoch] > min_delta:
+            patience_cnt = 0
+        else:
+            patience_cnt += 1
+        print('Early Stopping checks: %d/%d' %
+              (patience_cnt, patience))
+        if patience_cnt > patience:
+            print("Early Stopping Activado")
+            break
+
         print("Time elapsed %.2f minutes" % ((time.time() - t_i) / 60.0))
+
+
+# TESTEA SOLO EN EL ULTIMO
+mean_acc0, mean_acc1, mean_acc2, mean_acc3, mean_acc4, matsum0, matsum1, matsum2, matsum3, matsum4 = testrazas()
+
+
+test_acc_vals0.append(mean_acc0)
+test_acc_vals1.append(mean_acc1)
+test_acc_vals2.append(mean_acc2)
+test_acc_vals3.append(mean_acc3)
+test_acc_vals4.append(mean_acc4)
+
 train_writer.flush()
 validation_writer.flush()
 
 val_acc_vals = np.array(val_acc_vals)
 test_acc_vals = np.array(test_acc_vals)
+test_acc_vals0 = np.array(test_acc_vals0)
+test_acc_vals1 = np.array(test_acc_vals1)
+test_acc_vals2 = np.array(test_acc_vals2)
+test_acc_vals3 = np.array(test_acc_vals3)
+test_acc_vals4 = np.array(test_acc_vals4)
+
 best_epoch = np.argmax(val_acc_vals)
 test_acc_at_best = test_acc_vals[best_epoch]
 print('*' * 30)
 print("Testing set accuracy @ epoch %d (best validation acc): %.4f" % (best_epoch, test_acc_at_best))
 print('*' * 30)
+print("Testing set accuracy ultima Epoca: %.4f" % (test_accuracy))
+print('*' * 30)
 
 with sess.as_default():
     print('Confusion Matrix: \n', mat)
+    print('Confusion Matrix de Blancos: \n', matsum0)
+    print('Confusion Matrix de Negros: \n', matsum1)
+    print('Confusion Matrix de Asiaticos: \n', matsum2)
+    print('Confusion Matrix de Indios: \n', matsum3)
+    print('Confusion Matrix Otros: \n', matsum4)
 
-# test_confusion = sess.run(con_mat)
-# print(test_confusion)
-
-# print(tf.confusion_matrix(
-#     target,
-#     model_output,
-#     num_classes=None,
-#     dtype=tf.int32,
-#     name=None,
-#     weights=None
-# ))
-
-# def confusion_matrix(labels, predictions):
-#     """Calcula la matriz de confusion.
-#
-#     Args:
-#         labels: Array binario 1-D con las etiquetas reales.
-#         predictions: Array binario 1-D con las predicciones.
-#
-#     Returns:
-#         TP: Numero de verdaderos positivos.
-#         FP: Numero de falsos positivos.
-#         FN: Numero de falsos negativos.
-#         TN: Numero de verdaderos negativos.
-#     """
-#     # Map labels and predictions to {0, 1, 2, 3}
-#     encoded_data = 2 * labels + predictions
-#     TN = np.sum(encoded_data == 0)  # True negatives
-#     FP = np.sum(encoded_data == 1)  # False positives
-#     FN = np.sum(encoded_data == 2)  # False negatives
-#     TP = np.sum(encoded_data == 3)  # True positives
-#     print('TP = ',TP, 'FP = ',FP, 'FN = ',FN, 'TN = ',TN)
-#     return TP, FP, FN, TN
-#
-# confusion_matrix(target, tf.cast(correct_prediction, tf.float32))
