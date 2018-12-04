@@ -217,31 +217,9 @@ file5 = open(filename5, 'wb')
 pickle.dump(datos5, file5)
 file5.close()
 
-def unpickle(filename):
-    f = open(filename, 'rb')
-    dic = pickle.load(f, encoding='latin1')
-    f.close()
-    return dic
-
-train_data_list = []
-train_labels = []
-with open('datos3.pkl', 'rb') as f:
-    d = pickle.load(f)  # SACADO EL FOR E IMPORTADO IMAGENES Y LABELS CON DICT UNPICKLE
-    train_data_list.append(d['data'])
-    train_labels += d['labels']
-train_labels = np.asarray(train_labels)
-train_data = np.concatenate(train_data_list, axis=0).astype(np.float32)
-
-# cambiar por numero de foto a probar
-nro_foto = 3718
-imgplot = plt.imshow(train_data[nro_foto].astype(np.uint8))
-plt.savefig('fotodepruebadescomprimida.png')
-
-print(train_labels[0, nro_foto], train_labels[1, nro_foto])
-print('1 = mujer, 2 = hombre')
-
 # In[ ]:
 
 
 for i in range(1, 4):
     print(i)
+    
