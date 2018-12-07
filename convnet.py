@@ -176,7 +176,7 @@ con_mat = tf.confusion_matrix(labels=tf.argmax(target, 1), predictions=tf.argmax
                               dtype=tf.int32, name=None)
 
 #  con_vec = [Raza ,Edad, EtiquetaGenero, PrediccionGenero]
-con_vec = np.asarray([target_raza, target_edad,tf.argmax(target, 1),tf.argmax(model_output, 1)])
+con_vec = [target_raza, target_edad,tf.argmax(target, 1),tf.argmax(model_output, 1)]
 
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
 accuracy_summary = tf.summary.scalar('accuracy', accuracy)
@@ -215,7 +215,7 @@ def test():
     batches = cifar10.getTestSet(asBatches=True)
     accs = []
     matsum = np.zeros((2, 2))
-    vecsum = np.asarray(['Raza' ,'Edad', 'EtiquetaGenero', 'PrediccionGenero'])
+    vecsum = np.asarray([['Raza' ,'Edad', 'EtiquetaGenero', 'PrediccionGenero']])
     for batch in batches:
         data, genero, raza, edad = batch
         acc, mat, vec = sess.run((accuracy, con_mat, con_vec),
@@ -228,10 +228,10 @@ def test():
                             })
         accs.append(acc)
         matsum = matsum + mat
-        print(len(vec))
-        print(vecsum.shape)
+        # print(vecsum.shape)
+        # print(np.transpose(np.asarray(vec)).shape)
 
-        vecsum = np.vstack((vecsum, vec))
+        vecsum = np.concatenate((vecsum, np.transpose(np.asarray(vec))), axis=0)
 
     mean_acc = np.array(accs).mean()
     return mean_acc, matsum, vecsum
@@ -382,7 +382,7 @@ print("Trainable variables")
 for n in tf.trainable_variables():
     print(n.name)
 if use_convnet:
-    epochs = 30
+    epochs = 14
 else:
     epochs = 50
 
@@ -502,6 +502,7 @@ print("Testing set accuracy ultima Epoca: %.4f" % (test_accuracy))
 print('*' * 30)
 
 with sess.as_default():
+    np.set_printoptions(threshold=np.nan)
     print('Confusion Matrix: \n', mat)
     print('Vector Confusion: \n', vec)
     print('Confusion Matrix de Blancos: \n', matsum0)
