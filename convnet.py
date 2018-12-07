@@ -78,6 +78,12 @@ keep_prob = tf.placeholder(tf.float32, name='dropout_prob', shape=())
 
 target = tf.placeholder(tf.float32, name='target', shape=(batch_size, 2))
 
+# NUEVO PLACEHOLDER PARA EDAD Y RAZA:
+
+target_edad = tf.placeholder(tf.float32, name='edad', shape=(batch_size))
+
+target_raza = tf.placeholder(tf.float32, name='edad', shape=(batch_size))
+
 if use_convnet:
     layer_input = model_input
     previous_n_feature_maps = 3
@@ -169,6 +175,9 @@ print(tf.argmax(target, 1).shape)
 con_mat = tf.confusion_matrix(labels=tf.argmax(target, 1), predictions=tf.argmax(model_output, 1), num_classes=None,
                               dtype=tf.int32, name=None)
 
+#  con_vec = [Raza ,Edad, EtiquetaGenero, PrediccionGenero]
+con_vec = np.asarray([target_raza, target_edad,tf.argmax(target, 1),tf.argmax(model_output, 1)])
+
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
 accuracy_summary = tf.summary.scalar('accuracy', accuracy)
 learning_summaries = tf.summary.merge((xentropy_summary, accuracy_summary))
@@ -206,18 +215,26 @@ def test():
     batches = cifar10.getTestSet(asBatches=True)
     accs = []
     matsum = np.zeros((2, 2))
+    vecsum = np.asarray(['Raza' ,'Edad', 'EtiquetaGenero', 'PrediccionGenero'])
     for batch in batches:
         data, genero, raza, edad = batch
-        acc, mat = sess.run((accuracy, con_mat),
+        acc, mat, vec = sess.run((accuracy, con_mat, con_vec),
                             feed_dict={
                                 model_input: data,
                                 target: genero,
+                                target_edad: edad,
+                                target_raza: raza,
                                 keep_prob: 1.0
                             })
         accs.append(acc)
         matsum = matsum + mat
+        print(len(vec))
+        print(vecsum.shape)
+
+        vecsum = np.vstack((vecsum, vec))
+
     mean_acc = np.array(accs).mean()
-    return mean_acc, matsum
+    return mean_acc, matsum, vecsum
 
 
 # PARA GENERAR MATRICES DE CONFUSION SEGUN CADA ETNIA
@@ -431,7 +448,7 @@ Valid. acc. %.3f, loss %.3f' % (
             validation_loss
         ))
         val_acc_vals.append(validation_accuracy)
-        test_accuracy, mat = test()
+        test_accuracy, mat, vec = test()
 
         test_acc_vals.append(test_accuracy)
 
@@ -486,6 +503,7 @@ print('*' * 30)
 
 with sess.as_default():
     print('Confusion Matrix: \n', mat)
+    print('Vector Confusion: \n', vec)
     print('Confusion Matrix de Blancos: \n', matsum0)
     print('Confusion Matrix de Negros: \n', matsum1)
     print('Confusion Matrix de Asiaticos: \n', matsum2)

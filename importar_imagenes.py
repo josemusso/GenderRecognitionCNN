@@ -222,4 +222,3 @@ file5.close()
 
 for i in range(1, 4):
     print(i)
-    
