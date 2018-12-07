@@ -63,7 +63,7 @@ class CIFAR10:
         # Training set
         train_data_list = []
         train_labels_list = []
-        for bi in range(1, 6):
+        for bi in range(1, 5):
             d = unpickle(DIR_BINARIES + 'datos' + str(bi) + '.pkl')
             train_data_list.append(d['data'])
             train_labels_list.append(d['labels'])
@@ -72,7 +72,8 @@ class CIFAR10:
 
         # Check set
         check_proportion = validation_proportion + test_proportion
-        assert check_proportion > 0. and check_proportion < 1.
+        assert check_proportion > 0. and check_proportion < 1
+
         self.train_data, self.check_data, self.train_labels, self.check_labels = train_test_split(
             self.train_data, self.train_labels, test_size=check_proportion, random_state=1)
 
