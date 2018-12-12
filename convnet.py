@@ -518,8 +518,6 @@ matriz_Indio = np.zeros((2, 2))
 matriz_Otro = np.zeros((2, 2))
 
 for muestra in vec:
-    print('tipo muestra[0] = \n', type(muestra[0]))
-
     if muestra[0] == '0.0':
         if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
             matriz_Blanco[0][0] += 1
@@ -572,6 +570,8 @@ for muestra in vec:
             matriz_Otro[1][1] += 1
 
 # NORMALIZAR
+mat_norm = mat/np.linalg.norm(mat)
+
 matriz_Blanco_norm = matriz_Blanco/np.linalg.norm(matriz_Blanco)
 matriz_Negro_norm = matriz_Negro/np.linalg.norm(matriz_Negro)
 matriz_Asiatico_norm = matriz_Asiatico/np.linalg.norm(matriz_Asiatico)
@@ -579,6 +579,70 @@ matriz_Indio_norm = matriz_Indio/np.linalg.norm(matriz_Indio)
 matriz_Otro_norm = matriz_Otro/np.linalg.norm(matriz_Otro)
 
 # CONSTRUCCION GRAFICOS DE BARRA
+
+# Accuracy Rate por Raza
+
+ACC_Blancos_hombre = matriz_Blanco[0][0]/(matriz_Blanco[0][0]+matriz_Blanco[0][1])
+ACC_Blancos_mujeres = matriz_Blanco[1][1]/(matriz_Blanco[1][1]+matriz_Blanco[1][0])
+ACC_Blancos = (matriz_Blanco[0][0]+matriz_Blanco[1][1])/(matriz_Blanco[0][0]+matriz_Blanco[0][1]+matriz_Blanco[1][0]+matriz_Blanco[1][1])
+
+ACC_Negro_hombre = matriz_Negro[0][0]/(matriz_Negro[0][0]+matriz_Negro[0][1])
+ACC_Negro_mujeres = matriz_Negro[1][1]/(matriz_Negro[1][1]+matriz_Negro[1][0])
+ACC_Negro = (matriz_Negro[0][0]+matriz_Negro[1][1])/(matriz_Negro[0][0]+matriz_Negro[0][1]+matriz_Negro[1][0]+matriz_Negro[1][1])
+
+ACC_Asiatico_hombre = matriz_Asiatico[0][0]/(matriz_Asiatico[0][0]+matriz_Asiatico[0][1])
+ACC_Asiatico_mujeres = matriz_Asiatico[1][1]/(matriz_Asiatico[1][1]+matriz_Asiatico[1][0])
+ACC_Asiatico = (matriz_Asiatico[0][0]+matriz_Asiatico[1][1])/(matriz_Asiatico[0][0]+matriz_Asiatico[0][1]+matriz_Asiatico[1][0]+matriz_Asiatico[1][1])
+
+ACC_Indio_hombre = matriz_Indio[0][0]/(matriz_Indio[0][0]+matriz_Indio[0][1])
+ACC_Indio_mujeres = matriz_Indio[1][1]/(matriz_Indio[1][1]+matriz_Indio[1][0])
+ACC_Indio = (matriz_Indio[0][0]+matriz_Indio[1][1])/(matriz_Indio[0][0]+matriz_Indio[0][1]+matriz_Indio[1][0]+matriz_Indio[1][1])
+
+ACC_Total = np.mean([ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio])
+
+ACC_plot = [ACC_Blancos_hombre, ACC_Blancos_mujeres, ACC_Negro_hombre, ACC_Negro_mujeres, ACC_Asiatico_hombre,
+            ACC_Asiatico_mujeres, ACC_Indio_hombre, ACC_Indio_mujeres, ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio,
+            ACC_Total]
+
+N = 4
+
+fig, ax = plt.subplots()
+
+ind = np.arange(N)    # the x locations for the groups
+width = 0.35         # the width of the bars
+
+# PLOT GENEROS SEPARADOS
+menMeans = [ACC_Blancos_hombre, ACC_Negro_hombre, ACC_Asiatico_hombre, ACC_Indio_hombre]
+p1 = ax.bar(ind, menMeans, width, color='b')
+
+
+womenMeans = [ACC_Blancos_mujeres, ACC_Negro_mujeres, ACC_Asiatico_mujeres, ACC_Indio_mujeres]
+p2 = ax.bar(ind + width, womenMeans, width,
+            color='c')
+
+generalMeans = [ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio]
+
+
+# PLOT GENEROS JUNTOS
+ax.bar(4 , generalMeans[0], width, color='g')
+ax.bar(4 + width, generalMeans[1], width, color='y')
+ax.bar(4 + 2*width, generalMeans[2], width, color='g')
+ax.bar(4 + 3*width, generalMeans[3], width, color='y')
+
+# PLOT RAZAS JUNTAS
+ax.bar(6 + width/2, ACC_Total, width, color='r')
+
+ax.set_title('Accuracy por Raza')
+pos_ejes = [0 +width/2, 1 +width/2, 2 +width/2, 3 +width/2, 4+2*width/2, 6 +width/2]
+ax.set_xticks(pos_ejes)
+
+ax.set_xticklabels(('ACC_Blancos', 'ACC_Negro', 'ACC_Asiatico', 'ACC_Indio', 'Blancos\n Negros\n Asiaticos\n Indios', 'Total'))
+plt.xticks(rotation=45)
+
+ax.legend((p1[0], p2[0]), ('Hombres', 'Mujeres'))
+ax.autoscale_view()
+
+plt.show()
 
 # False Discovery Rate
 FDR_Blancos_hombre = matriz_Blanco[0][1]/(matriz_Blanco[0][0]+matriz_Blanco[0][1])
@@ -664,14 +728,14 @@ plt.show()
 
 with sess.as_default():
     np.set_printoptions(threshold=np.nan)
-    print('Confusion Matrix: \n', mat)
     print('Vector Confusion: \n', vec)
     # print('Confusion Matrix de Blancos: \n', matsum0)
     # print('Confusion Matrix de Negros: \n', matsum1)
     # print('Confusion Matrix de Asiaticos: \n', matsum2)
     # print('Confusion Matrix de Indios: \n', matsum3)
     # print('Confusion Matrix Otros: \n', matsum4)
-
+    print('Confusion Matrix: \n', mat)
+    print('Confusion Matrix Normalizada: \n', mat_norm)
     print('MATRIZ NORMALIZADA Blancos: \n', matriz_Blanco_norm)
     print('MATRIZ NORMALIZADA Negros: \n', matriz_Negro_norm)
     print('MATRIZ NORMALIZADA Asiaticos: \n', matriz_Asiatico_norm)

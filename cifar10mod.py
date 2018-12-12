@@ -63,7 +63,7 @@ class CIFAR10:
         # Training set
         train_data_list = []
         train_labels_list = []
-        for bi in range(1, 6):
+        for bi in range(1, 5):
             d = unpickle(DIR_BINARIES + 'datos' + str(bi) + '.pkl')
             train_data_list.append(d['data'])
             train_labels_list.append(d['labels'])
