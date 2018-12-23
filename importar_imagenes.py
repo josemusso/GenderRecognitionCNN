@@ -1,3 +1,8 @@
+# coding: utf-8
+
+# In[5]:
+
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -10,16 +15,17 @@ import time
 import sys
 import matplotlib.pyplot as plt
 import tarfile
+import random
 
 import tensorflow as tf
-
 from PIL import Image
 from scipy.misc import imresize
+
 from urllib.request import urlretrieve
 from sklearn.model_selection import train_test_split
 from cifar10mod import CIFAR10
 
-# In[ ]:
+# In[6]:
 
 
 # importar etiquetas e imagenes
@@ -33,36 +39,53 @@ def prepare_image(image, target_height=64, target_width=64):
     return image
 
 
+# In[4]:
+
+
+print(filelist[1])
+
+# In[1]:
+
+
 # IMAGENES REESCALADAS A 64
 print('escalando imagenes...')
 imagenes_chicas = []
-for i in range(imagenes.__len__()):
-    imagenes_chicas.append(prepare_image(imagenes[i]))
-imagenes_chicas = np.array(imagenes_chicas)
-# imgplot = plt.imshow(imagenes_chicas[0])
-
-
-# In[ ]:
-
-
 edad = []
 genero = []
 raza = []
-c = 0
-for fname in filelist:
-    print(fname)
-    edad.append(int(fname.split('_')[0].split('/')[1]))
-    genero.append(int(fname.split('_')[1]))
-    raza.append(int(fname.split('_')[2]))
-    c += 1
-    print(c)
+
+# raza a modificar:
+'''     
+blanco = 0
+negro = 1
+asiatico = 2
+indio = 3
+otro = 4
+'''
+
+razamod = 2
+porcentaje = 0        # DE 1 A 100
+
+for i in range(imagenes.__len__()):
+    if 14 <= int(filelist[i].split('_')[0].split('/')[1]) <= 59:
+        if int(filelist[i].split('_')[2]) == razamod:
+            if random.randint(1,100) <= porcentaje:
+                edad.append(int(filelist[i].split('_')[0].split('/')[1]))
+                genero.append(int(filelist[i].split('_')[1]))
+                raza.append(int(filelist[i].split('_')[2]))
+                imagenes_chicas.append(prepare_image(imagenes[i]))
+
+        else:
+            edad.append(int(filelist[i].split('_')[0].split('/')[1]))
+            genero.append(int(filelist[i].split('_')[1]))
+            raza.append(int(filelist[i].split('_')[2]))
+            imagenes_chicas.append(prepare_image(imagenes[i]))
+
+imagenes_chicas = np.array(imagenes_chicas)
+imgplot = plt.imshow(imagenes_chicas[0])
 edad = np.array(edad)
 genero = np.array(genero)
 raza = np.array(raza)
-# print(filelist.__len__())
-# print(edad[1])
-# print(genero[1])
-print(raza)
 
 # # Exploración del dataset
 
@@ -79,6 +102,7 @@ m_negros = np.zeros(117, dtype=int)
 m_asiaticos = np.zeros(117, dtype=int)
 m_indios = np.zeros(117, dtype=int)
 m_otros = np.zeros(117, dtype=int)
+
 for ident in range(genero.__len__()):
     if genero[ident] == 0:
         if raza[ident] == 0:
@@ -112,6 +136,33 @@ for ident in range(genero.__len__()):
         elif raza[ident] == 4:
             e = edad[ident]
             m_otros[e] += 1
+
+
+print(sum(h_negros)+sum(m_negros))
+# PLOT DESCRIPCION CONJUNTO DEL TEST (FALTA EL TOTAL)
+
+# ARREGLAR
+
+menMeans = [sum(h_blancos), sum(h_negros), sum(h_asiaticos), sum(h_indios), sum(h_otros)]
+womenMeans = [sum(m_blancos), sum(m_negros), sum(m_asiaticos), sum(m_indios), sum(m_otros)]
+print(menMeans)
+print(womenMeans)
+
+ind = [0, 2000, 4000, 6000, 8000]  # the x locations for the groups
+width = 1000  # the width of the bars: can also be len(x) sequence
+
+p1 = plt.bar(ind, menMeans, width, color='#d62728')
+p2 = plt.bar(ind, womenMeans, width,
+             bottom=menMeans)
+
+plt.ylabel('Muestras')
+plt.title('Composicion Dataset con raza ' +  str(razamod) + ' presente en un ' + str(porcentaje) + '%')
+plt.xticks(ind, ('Blancos', 'Negros', 'Asiaticos', 'Indios', 'Otros'))
+plt.legend((p1[0], p2[0]), ('Hombres', 'Mujeres'))
+plt.gca().invert_yaxis()
+plt.gca().set_ylim([0,7500])
+
+plt.show()
 
         # In[ ]:
 
@@ -169,13 +220,11 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 plt.show()
 
 # # Guardar datos
-#
+# ARREGLAR LOS INDICES A VALORES DINAMICOS
 
-# In[ ]:
-
-
-datos1 = {'data': imagenes_chicas[0:5541],
-          'labels': np.transpose([edad[0:5541], genero[0:5541], raza[0:5541]])
+datos1 = {'data': imagenes_chicas[0:int(len(imagenes_chicas)/4)],
+          'labels': np.transpose([edad[0:int(len(imagenes_chicas)/4)], genero[0:int(len(imagenes_chicas)/4)],
+                                  raza[0:int(len(imagenes_chicas)/4)]])
           }
 
 filename1 = "datos1.pkl"
@@ -183,8 +232,10 @@ file1 = open(filename1, 'wb')
 pickle.dump(datos1, file1)
 file1.close()
 
-datos2 = {'data': imagenes_chicas[5541:11082],
-          'labels': np.transpose([edad[5541:11082], genero[5541:11082], raza[5541:11082]])
+datos2 = {'data': imagenes_chicas[int(len(imagenes_chicas)/4)+1:int(2*len(imagenes_chicas)/4)],
+          'labels': np.transpose([edad[int(len(imagenes_chicas)/4)+1:int(2*len(imagenes_chicas)/4)],
+                                  genero[int(len(imagenes_chicas)/4)+1:int(2*len(imagenes_chicas)/4)],
+                                  raza[int(len(imagenes_chicas)/4)+1:int(2*len(imagenes_chicas)/4)]])
           }
 
 filename2 = "datos2.pkl"
@@ -192,8 +243,10 @@ file2 = open(filename2, 'wb')
 pickle.dump(datos2, file2)
 file2.close()
 
-datos3 = {'data': imagenes_chicas[11082:16624],
-          'labels': np.transpose([edad[11082:16624], genero[11082:16624], raza[11082:16624]])
+datos3 = {'data': imagenes_chicas[int(2*len(imagenes_chicas)/4)+1:int(3*len(imagenes_chicas)/4)],
+          'labels': np.transpose([edad[int(2*len(imagenes_chicas)/4)+1:int(3*len(imagenes_chicas)/4)],
+                                  genero[int(2*len(imagenes_chicas)/4)+1:int(3*len(imagenes_chicas)/4)],
+                                  raza[int(2*len(imagenes_chicas)/4)+1:int(3*len(imagenes_chicas)/4)]])
           }
 
 filename3 = "datos3.pkl"
@@ -201,24 +254,12 @@ file3 = open(filename3, 'wb')
 pickle.dump(datos3, file3)
 file3.close()
 
-datos4 = {'data': imagenes_chicas[16624:22165],
-          'labels': np.transpose([edad[16624:22165], genero[16624:22165], raza[16624:22165]])
+datos4 = {'data': imagenes_chicas[int(3*len(imagenes_chicas)/4)+1:int(len(imagenes_chicas))-1],
+          'labels': np.transpose([edad[int(3*len(imagenes_chicas)/4)+1:int(len(imagenes_chicas))-1],
+                                  genero[int(3*len(imagenes_chicas)/4)+1:int(len(imagenes_chicas))-1],
+                                  raza[int(3*len(imagenes_chicas)/4)+1:int(len(imagenes_chicas))-1]])
           }
 filename4 = "datos4.pkl"
 file4 = open(filename4, 'wb')
 pickle.dump(datos4, file4)
 file4.close()
-
-datos5 = {'data': imagenes_chicas[22165:27707],
-          'labels': np.transpose([edad[22165:27707], genero[22165:27707], raza[22165:27707]])
-          }
-filename5 = "datos5.pkl"
-file5 = open(filename5, 'wb')
-pickle.dump(datos5, file5)
-file5.close()
-
-# In[ ]:
-
-
-for i in range(1, 4):
-    print(i)

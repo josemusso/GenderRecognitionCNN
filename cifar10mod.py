@@ -28,8 +28,8 @@ from sklearn.model_selection import train_test_split
 
 # In[ ]:
 
-
-DIR_BINARIES = 'Datos/'
+# SE CAMBIO LA DIRECCION POR LA DE CARPETA DE DESBALANCA
+DIR_BINARIES = 'Datos_desb/asiaticos_20/'
 
 
 def unpickle(filename):
@@ -63,7 +63,8 @@ class CIFAR10:
         # Training set
         train_data_list = []
         train_labels_list = []
-        for bi in range(1, 5):
+        r = range(1, 5)
+        for bi in r:
             d = unpickle(DIR_BINARIES + 'datos' + str(bi) + '.pkl')
             train_data_list.append(d['data'])
             train_labels_list.append(d['labels'])

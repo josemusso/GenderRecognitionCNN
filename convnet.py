@@ -1,3 +1,8 @@
+# coding: utf-8
+
+# In[1]:
+
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -5,7 +10,7 @@ from __future__ import print_function
 import os
 import sys
 import time
-
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -158,7 +163,7 @@ with tf.name_scope('loss_function'):
 
 # Optimization
 with tf.name_scope('optimizer'):
-    optimizer = tf.train.RMSPropOptimizer(0.00005)              # REDUCIDA 1 MAGNITUD
+    optimizer = tf.train.RMSPropOptimizer(0.00005)  # REDUCIDA 1 MAGNITUD
     grads_vars = optimizer.compute_gradients(cross_entropy)
     optimizer.apply_gradients(grads_vars)
     train_step = optimizer.minimize(cross_entropy)
@@ -176,7 +181,7 @@ con_mat = tf.confusion_matrix(labels=tf.argmax(target, 1), predictions=tf.argmax
                               dtype=tf.int32, name=None)
 
 #  con_vec = [Raza ,Edad, EtiquetaGenero, PrediccionGenero]
-con_vec = [target_raza, target_edad,tf.argmax(target, 1),tf.argmax(model_output, 1)]
+con_vec = [target_raza, target_edad, tf.argmax(target, 1), tf.argmax(model_output, 1)]
 
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
 accuracy_summary = tf.summary.scalar('accuracy', accuracy)
@@ -211,21 +216,22 @@ def validate():
         })
     return summary, mean_acc, mean_xent
 
+
 def test():
     batches = cifar10.getTestSet(asBatches=True)
     accs = []
     matsum = np.zeros((2, 2))
-    vecsum = np.asarray([['Raza' ,'Edad', 'EtiquetaGenero', 'PrediccionGenero']])
+    vecsum = np.asarray([['Raza', 'Edad', 'EtiquetaGenero', 'PrediccionGenero']])
     for batch in batches:
         data, genero, raza, edad = batch
         acc, mat, vec = sess.run((accuracy, con_mat, con_vec),
-                            feed_dict={
-                                model_input: data,
-                                target: genero,
-                                target_edad: edad,
-                                target_raza: raza,
-                                keep_prob: 1.0
-                            })
+                                 feed_dict={
+                                     model_input: data,
+                                     target: genero,
+                                     target_edad: edad,
+                                     target_raza: raza,
+                                     keep_prob: 1.0
+                                 })
         accs.append(acc)
         matsum = matsum + mat
         # print(vecsum.shape)
@@ -253,11 +259,11 @@ def testrazas():
     matsum3 = np.zeros((2, 2))
     matsum4 = np.zeros((2, 2))
 
-    mean_acc0 =0
-    mean_acc1 =0
-    mean_acc2 =0
-    mean_acc3 =0
-    mean_acc4 =0
+    mean_acc0 = 0
+    mean_acc1 = 0
+    mean_acc2 = 0
+    mean_acc3 = 0
+    mean_acc4 = 0
 
     data0 = []
     genero0 = []
@@ -298,70 +304,70 @@ def testrazas():
                 data4.append(data[i])
                 genero4.append(genero[i])
 
-        if len(data0)>64:
+        if len(data0) > 64:
             acc0, mat0 = sess.run((accuracy, con_mat),
-                                feed_dict={
-                                    model_input: data0[0:64],
-                                    target: genero0[0:64],
-                                    keep_prob: 1.0
-                                })
+                                  feed_dict={
+                                      model_input: data0[0:64],
+                                      target: genero0[0:64],
+                                      keep_prob: 1.0
+                                  })
             accs0.append(acc0)
             matsum0 = matsum0 + mat0
             mean_acc0 = np.array(accs0).mean()
-            data0 = data0[65:len(data0)-1]
-            genero0 = genero0[65:len(genero0)-1]
+            data0 = data0[65:len(data0) - 1]
+            genero0 = genero0[65:len(genero0) - 1]
 
-        if len(data1)>64:
+        if len(data1) > 64:
             acc1, mat1 = sess.run((accuracy, con_mat),
-                                feed_dict={
-                                    model_input: data1[0:64],
-                                    target: genero1[0:64],
-                                    keep_prob: 1.0
-                                })
+                                  feed_dict={
+                                      model_input: data1[0:64],
+                                      target: genero1[0:64],
+                                      keep_prob: 1.0
+                                  })
             accs1.append(acc1)
             matsum1 = matsum1 + mat1
             mean_acc1 = np.array(accs1).mean()
-            data1 = data1[65:len(data1)-1]
-            genero1 = genero1[65:len(genero1)-1]
+            data1 = data1[65:len(data1) - 1]
+            genero1 = genero1[65:len(genero1) - 1]
 
-        if len(data2)>64:
+        if len(data2) > 64:
             acc2, mat2 = sess.run((accuracy, con_mat),
-                                feed_dict={
-                                    model_input: data2[0:64],
-                                    target: genero2[0:64],
-                                    keep_prob: 1.0
-                                })
+                                  feed_dict={
+                                      model_input: data2[0:64],
+                                      target: genero2[0:64],
+                                      keep_prob: 1.0
+                                  })
             accs2.append(acc2)
             matsum2 = matsum2 + mat2
             mean_acc2 = np.array(accs2).mean()
-            data2 = data2[65:len(data2)-1]
-            genero2 = genero2[65:len(genero2)-1]
+            data2 = data2[65:len(data2) - 1]
+            genero2 = genero2[65:len(genero2) - 1]
 
-        if len(data3)>64:
+        if len(data3) > 64:
             acc3, mat3 = sess.run((accuracy, con_mat),
-                                feed_dict={
-                                    model_input: data3[0:64],
-                                    target: genero3[0:64],
-                                    keep_prob: 1.0
-                                })
+                                  feed_dict={
+                                      model_input: data3[0:64],
+                                      target: genero3[0:64],
+                                      keep_prob: 1.0
+                                  })
             accs3.append(acc3)
             matsum3 = matsum3 + mat3
             mean_acc3 = np.array(accs3).mean()
-            data3 = data3[65:len(data3)-1]
-            genero3 = genero3[65:len(genero3)-1]
+            data3 = data3[65:len(data3) - 1]
+            genero3 = genero3[65:len(genero3) - 1]
 
-        if len(data4)>64:
+        if len(data4) > 64:
             acc4, mat4 = sess.run((accuracy, con_mat),
-                                feed_dict={
-                                    model_input: data4[0:64],
-                                    target: genero4[0:64],
-                                    keep_prob: 1.0
-                                })
+                                  feed_dict={
+                                      model_input: data4[0:64],
+                                      target: genero4[0:64],
+                                      keep_prob: 1.0
+                                  })
             accs4.append(acc4)
             matsum4 = matsum4 + mat4
             mean_acc4 = np.array(accs4).mean()
-            data4 = data4[65:len(data4)-1]
-            genero4 = genero4[65:len(genero4)-1]
+            data4 = data4[65:len(data4) - 1]
+            genero4 = genero4[65:len(genero4) - 1]
 
     return mean_acc0, mean_acc1, mean_acc2, mean_acc3, mean_acc4, matsum0, matsum1, matsum2, matsum3, matsum4
 
@@ -382,7 +388,7 @@ print("Trainable variables")
 for n in tf.trainable_variables():
     print(n.name)
 if use_convnet:
-    epochs = 5
+    epochs = 10
 else:
     epochs = 50
 
@@ -397,7 +403,7 @@ test_acc_vals3 = []
 test_acc_vals4 = []
 
 hist_loss = [1.0]
-patience_cnt =0
+patience_cnt = 0
 
 while cifar10.getEpoch() < epochs:
     epoch = cifar10.getEpoch()
@@ -438,8 +444,7 @@ while cifar10.getEpoch() < epochs:
 
         summary, validation_accuracy, validation_loss = validate()
         validation_writer.add_summary(summary, step)
-        print('[Epoch %d, it %d] Training acc. %.3f, loss %.3f. \
-Valid. acc. %.3f, loss %.3f' % (
+        print('[Epoch %d, it %d] Training acc. %.3f, loss %.3f. Valid. acc. %.3f, loss %.3f' % (
             epoch,
             step,
             acc,
@@ -451,7 +456,6 @@ Valid. acc. %.3f, loss %.3f' % (
         test_accuracy, mat, vec = test()
 
         test_acc_vals.append(test_accuracy)
-
 
         # IMPLEMENTACION EARLY STOPPING
 
@@ -471,10 +475,8 @@ Valid. acc. %.3f, loss %.3f' % (
 
         print("Time elapsed %.2f minutes" % ((time.time() - t_i) / 60.0))
 
-
 # TESTEA SOLO EN EL ULTIMO
 mean_acc0, mean_acc1, mean_acc2, mean_acc3, mean_acc4, matsum0, matsum1, matsum2, matsum3, matsum4 = testrazas()
-
 
 test_acc_vals0.append(mean_acc0)
 test_acc_vals1.append(mean_acc1)
@@ -516,7 +518,6 @@ matriz_Negro = np.zeros((2, 2))
 matriz_Asiatico = np.zeros((2, 2))
 matriz_Indio = np.zeros((2, 2))
 matriz_Otro = np.zeros((2, 2))
-
 for muestra in vec:
     if muestra[0] == '0.0':
         if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
@@ -548,7 +549,6 @@ for muestra in vec:
         if (muestra[2] == '1.0') & (muestra[3] == '1.0'):
             matriz_Asiatico[1][1] += 1
 
-
     if muestra[0] == '3.0':
         if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
             matriz_Indio[0][0] += 1
@@ -570,33 +570,37 @@ for muestra in vec:
             matriz_Otro[1][1] += 1
 
 # NORMALIZAR
-mat_norm = mat/np.linalg.norm(mat)
+mat_norm = mat / np.linalg.norm(mat)
 
-matriz_Blanco_norm = matriz_Blanco/np.linalg.norm(matriz_Blanco)
-matriz_Negro_norm = matriz_Negro/np.linalg.norm(matriz_Negro)
-matriz_Asiatico_norm = matriz_Asiatico/np.linalg.norm(matriz_Asiatico)
-matriz_Indio_norm = matriz_Indio/np.linalg.norm(matriz_Indio)
-matriz_Otro_norm = matriz_Otro/np.linalg.norm(matriz_Otro)
+matriz_Blanco_norm = matriz_Blanco / np.linalg.norm(matriz_Blanco)
+matriz_Negro_norm = matriz_Negro / np.linalg.norm(matriz_Negro)
+matriz_Asiatico_norm = matriz_Asiatico / np.linalg.norm(matriz_Asiatico)
+matriz_Indio_norm = matriz_Indio / np.linalg.norm(matriz_Indio)
+matriz_Otro_norm = matriz_Otro / np.linalg.norm(matriz_Otro)
 
 # CONSTRUCCION GRAFICOS DE BARRA
 
-# Accuracy Rate por Raza
+# Accuracy Rate por Raza (de todos los predichos hombres, cuantos son hombres realmente)
 
-ACC_Blancos_hombre = matriz_Blanco[0][0]/(matriz_Blanco[0][0]+matriz_Blanco[0][1])
-ACC_Blancos_mujeres = matriz_Blanco[1][1]/(matriz_Blanco[1][1]+matriz_Blanco[1][0])
-ACC_Blancos = (matriz_Blanco[0][0]+matriz_Blanco[1][1])/(matriz_Blanco[0][0]+matriz_Blanco[0][1]+matriz_Blanco[1][0]+matriz_Blanco[1][1])
+ACC_Blancos_hombre = matriz_Blanco[0][0] / (matriz_Blanco[0][0] + matriz_Blanco[0][1])
+ACC_Blancos_mujeres = matriz_Blanco[1][1] / (matriz_Blanco[1][1] + matriz_Blanco[1][0])
+ACC_Blancos = (matriz_Blanco[0][0] + matriz_Blanco[1][1]) / (
+            matriz_Blanco[0][0] + matriz_Blanco[0][1] + matriz_Blanco[1][0] + matriz_Blanco[1][1])
 
-ACC_Negro_hombre = matriz_Negro[0][0]/(matriz_Negro[0][0]+matriz_Negro[0][1])
-ACC_Negro_mujeres = matriz_Negro[1][1]/(matriz_Negro[1][1]+matriz_Negro[1][0])
-ACC_Negro = (matriz_Negro[0][0]+matriz_Negro[1][1])/(matriz_Negro[0][0]+matriz_Negro[0][1]+matriz_Negro[1][0]+matriz_Negro[1][1])
+ACC_Negro_hombre = matriz_Negro[0][0] / (matriz_Negro[0][0] + matriz_Negro[0][1])
+ACC_Negro_mujeres = matriz_Negro[1][1] / (matriz_Negro[1][1] + matriz_Negro[1][0])
+ACC_Negro = (matriz_Negro[0][0] + matriz_Negro[1][1]) / (
+            matriz_Negro[0][0] + matriz_Negro[0][1] + matriz_Negro[1][0] + matriz_Negro[1][1])
 
-ACC_Asiatico_hombre = matriz_Asiatico[0][0]/(matriz_Asiatico[0][0]+matriz_Asiatico[0][1])
-ACC_Asiatico_mujeres = matriz_Asiatico[1][1]/(matriz_Asiatico[1][1]+matriz_Asiatico[1][0])
-ACC_Asiatico = (matriz_Asiatico[0][0]+matriz_Asiatico[1][1])/(matriz_Asiatico[0][0]+matriz_Asiatico[0][1]+matriz_Asiatico[1][0]+matriz_Asiatico[1][1])
+ACC_Asiatico_hombre = matriz_Asiatico[0][0] / (matriz_Asiatico[0][0] + matriz_Asiatico[0][1])
+ACC_Asiatico_mujeres = matriz_Asiatico[1][1] / (matriz_Asiatico[1][1] + matriz_Asiatico[1][0])
+ACC_Asiatico = (matriz_Asiatico[0][0] + matriz_Asiatico[1][1]) / (
+            matriz_Asiatico[0][0] + matriz_Asiatico[0][1] + matriz_Asiatico[1][0] + matriz_Asiatico[1][1])
 
-ACC_Indio_hombre = matriz_Indio[0][0]/(matriz_Indio[0][0]+matriz_Indio[0][1])
-ACC_Indio_mujeres = matriz_Indio[1][1]/(matriz_Indio[1][1]+matriz_Indio[1][0])
-ACC_Indio = (matriz_Indio[0][0]+matriz_Indio[1][1])/(matriz_Indio[0][0]+matriz_Indio[0][1]+matriz_Indio[1][0]+matriz_Indio[1][1])
+ACC_Indio_hombre = matriz_Indio[0][0] / (matriz_Indio[0][0] + matriz_Indio[0][1])
+ACC_Indio_mujeres = matriz_Indio[1][1] / (matriz_Indio[1][1] + matriz_Indio[1][0])
+ACC_Indio = (matriz_Indio[0][0] + matriz_Indio[1][1]) / (
+            matriz_Indio[0][0] + matriz_Indio[0][1] + matriz_Indio[1][0] + matriz_Indio[1][1])
 
 ACC_Total = np.mean([ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio])
 
@@ -604,39 +608,61 @@ ACC_plot = [ACC_Blancos_hombre, ACC_Blancos_mujeres, ACC_Negro_hombre, ACC_Negro
             ACC_Asiatico_mujeres, ACC_Indio_hombre, ACC_Indio_mujeres, ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio,
             ACC_Total]
 
+# PLOT DESCRIPCION CONJUNTO DEL TEST (FALTA EL TOTAL)
+
+N = 5
+menMeans = [matriz_Blanco[0][0] + matriz_Blanco[1][0], matriz_Negro[0][0] + matriz_Negro[1][0],
+            matriz_Asiatico[0][0] + matriz_Asiatico[1][0], matriz_Indio[0][0] + matriz_Indio[1][0],
+            matriz_Otro[0][0] + matriz_Otro[1][0]]
+womenMeans = [matriz_Blanco[0][1] + matriz_Blanco[1][1], matriz_Negro[0][1] + matriz_Negro[1][1],
+              matriz_Asiatico[0][1] + matriz_Asiatico[1][1], matriz_Indio[0][1] + matriz_Indio[1][1],
+              matriz_Otro[0][1] + matriz_Otro[1][1]]
+ind = np.arange(N)  # the x locations for the groups
+width = 0.35  # the width of the bars: can also be len(x) sequence
+
+p1 = plt.bar(ind, menMeans, width, color='#d62728')
+p2 = plt.bar(ind, womenMeans, width,
+             bottom=menMeans)
+
+plt.ylabel('Muestras')
+plt.title('Composicion Test Set')
+plt.xticks(ind, ('Blancos', 'Negros', 'Asiaticos', 'Indios', 'Otros'))
+plt.legend((p1[0], p2[0]), ('Hombres', 'Mujeres'))
+
+plt.show()
+
+# COMIENZO PLOT COMPLEJO
 N = 4
 
 fig, ax = plt.subplots()
 
-ind = np.arange(N)    # the x locations for the groups
-width = 0.35         # the width of the bars
+ind = np.arange(N)  # the x locations for the groups
+width = 0.35  # the width of the bars
 
 # PLOT GENEROS SEPARADOS
 menMeans = [ACC_Blancos_hombre, ACC_Negro_hombre, ACC_Asiatico_hombre, ACC_Indio_hombre]
-p1 = ax.bar(ind, menMeans, width, color='b')
-
+p1 = ax.bar(ind, menMeans, width, color='#d62728')
 
 womenMeans = [ACC_Blancos_mujeres, ACC_Negro_mujeres, ACC_Asiatico_mujeres, ACC_Indio_mujeres]
-p2 = ax.bar(ind + width, womenMeans, width,
-            color='c')
+p2 = ax.bar(ind + width, womenMeans, width)
 
 generalMeans = [ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio]
 
-
 # PLOT GENEROS JUNTOS
-ax.bar(4 , generalMeans[0], width, color='g')
+ax.bar(4, generalMeans[0], width, color='g')
 ax.bar(4 + width, generalMeans[1], width, color='y')
-ax.bar(4 + 2*width, generalMeans[2], width, color='g')
-ax.bar(4 + 3*width, generalMeans[3], width, color='y')
+ax.bar(4 + 2 * width, generalMeans[2], width, color='g')
+ax.bar(4 + 3 * width, generalMeans[3], width, color='y')
 
 # PLOT RAZAS JUNTAS
-ax.bar(6 + width/2, ACC_Total, width, color='r')
+ax.bar(6 + width / 2, ACC_Total, width, color='r')
 
-ax.set_title('Accuracy por Raza')
-pos_ejes = [0 +width/2, 1 +width/2, 2 +width/2, 3 +width/2, 4+2*width/2, 6 +width/2]
+ax.set_title('Precision por Raza, Accuracy por Raza, Accuracy total')
+pos_ejes = [0 + width / 2, 1 + width / 2, 2 + width / 2, 3 + width / 2, 4 + 2 * width / 2, 6 + width / 2]
 ax.set_xticks(pos_ejes)
 
-ax.set_xticklabels(('ACC_Blancos', 'ACC_Negro', 'ACC_Asiatico', 'ACC_Indio', 'Blancos\n Negros\n Asiaticos\n Indios', 'Total'))
+ax.set_xticklabels(
+    ('ACC_Blancos', 'ACC_Negro', 'ACC_Asiatico', 'ACC_Indio', 'Blancos\n Negros\n Asiaticos\n Indios', 'Total'))
 plt.xticks(rotation=45)
 
 ax.legend((p1[0], p2[0]), ('Hombres', 'Mujeres'))
@@ -644,83 +670,34 @@ ax.autoscale_view()
 
 plt.show()
 
-# False Discovery Rate
-FDR_Blancos_hombre = matriz_Blanco[0][1]/(matriz_Blanco[0][0]+matriz_Blanco[0][1])
-FDR_Blancos_mujeres = matriz_Blanco[1][0]/(matriz_Blanco[1][1]+matriz_Blanco[1][0])
-FDR_Blancos = [FDR_Blancos_hombre, FDR_Blancos_mujeres]
-
-FDR_Negro_hombre = matriz_Negro[0][1]/(matriz_Negro[0][0]+matriz_Negro[0][1])
-FDR_Negro_mujeres = matriz_Negro[1][0]/(matriz_Negro[1][1]+matriz_Negro[1][0])
-FDR_Negro = [FDR_Negro_hombre, FDR_Negro_mujeres]
-
-FDR_Asiatico_hombre = matriz_Asiatico[0][1]/(matriz_Asiatico[0][0]+matriz_Asiatico[0][1])
-FDR_Asiatico_mujeres = matriz_Asiatico[1][0]/(matriz_Asiatico[1][1]+matriz_Asiatico[1][0])
-FDR_Asiatico = [FDR_Asiatico_hombre, FDR_Asiatico_mujeres]
-
-FDR_Indio_hombre = matriz_Indio[0][1]/(matriz_Indio[0][0]+matriz_Indio[0][1])
-FDR_Indio_mujeres = matriz_Indio[1][0]/(matriz_Indio[1][1]+matriz_Indio[1][0])
-FDR_Indio = [FDR_Indio_hombre, FDR_Indio_mujeres]
-
-FDR_Total = [FDR_Blancos_hombre, FDR_Blancos_mujeres, FDR_Negro_hombre, FDR_Negro_mujeres, FDR_Asiatico_hombre, FDR_Asiatico_mujeres, FDR_Indio_hombre, FDR_Indio_mujeres]
-
-x = np.arange(8)
-fig, ax = plt.subplots()
-plt.bar(x, FDR_Total)
-plt.xticks(x, ('FDR_Blancos_hombre', 'FDR_Blancos_mujeres', 'FDR_Negro_hombre', 'FDR_Negro_mujeres', 'FDR_Asiatico_hombre', 'FDR_Asiatico_mujeres', 'FDR_Indio_hombre', 'FDR_Indio_mujeres'))
-plt.xticks(rotation=45)
-plt.show()
-
-# False Omission Rate
-
-FOR_Blancos_hombre = matriz_Blanco[1][0]/(matriz_Blanco[1][0]+matriz_Blanco[1][1])
-FOR_Blancos_mujeres = matriz_Blanco[0][1]/(matriz_Blanco[0][1]+matriz_Blanco[0][0])
-FOR_Blancos = [FDR_Blancos_hombre, FDR_Blancos_mujeres]
-
-FOR_Negro_hombre = matriz_Negro[1][0]/(matriz_Negro[1][0]+matriz_Negro[1][1])
-FOR_Negro_mujeres = matriz_Negro[0][1]/(matriz_Negro[0][1]+matriz_Negro[0][0])
-FOR_Negro = [FDR_Negro_hombre, FDR_Negro_mujeres]
-
-FOR_Asiatico_hombre = matriz_Asiatico[1][0]/(matriz_Asiatico[1][0]+matriz_Asiatico[1][1])
-FOR_Asiatico_mujeres = matriz_Asiatico[0][1]/(matriz_Asiatico[0][1]+matriz_Asiatico[0][0])
-FOR_Asiatico = [FDR_Asiatico_hombre, FDR_Asiatico_mujeres]
-
-FOR_Indio_hombre = matriz_Indio[1][0]/(matriz_Indio[1][0]+matriz_Indio[1][1])
-FOR_Indio_mujeres = matriz_Indio[0][1]/(matriz_Indio[0][1]+matriz_Indio[0][0])
-FOR_Indio = [FDR_Indio_hombre, FDR_Indio_mujeres]
-
-FOR_Total = [FOR_Blancos_hombre, FOR_Blancos_mujeres, FOR_Negro_hombre, FOR_Negro_mujeres, FOR_Asiatico_hombre, FOR_Asiatico_mujeres, FOR_Indio_hombre, FOR_Indio_mujeres]
-
-x = np.arange(8)
-fig, ax = plt.subplots()
-plt.bar(x, FOR_Total)
-plt.xticks(x, ('FOR_Blancos_hombre', 'FOR_Blancos_mujeres', 'FOR_Negro_hombre', 'FOR_Negro_mujeres', 'FOR_Asiatico_hombre', 'FOR_Asiatico_mujeres', 'FOR_Indio_hombre', 'FOR_Indio_mujeres'))
-plt.xticks(rotation=45)
-plt.show()
 
 # False Negative Rate
 
-FNR_Blancos_hombre = matriz_Blanco[1][0]/(matriz_Blanco[1][0]+matriz_Blanco[0][0])
-FNR_Blancos_mujeres = matriz_Blanco[1][0]/(matriz_Blanco[1][0]+matriz_Blanco[1][1])
+FNR_Blancos_hombre = matriz_Blanco[1][0] / (matriz_Blanco[1][0] + matriz_Blanco[0][0])
+FNR_Blancos_mujeres = matriz_Blanco[0][1] / (matriz_Blanco[1][0] + matriz_Blanco[1][1])
 FNR_Blancos = [FNR_Blancos_hombre, FNR_Blancos_mujeres]
 
-FNR_Negro_hombre = matriz_Negro[1][0]/(matriz_Negro[1][0]+matriz_Negro[0][0])
-FNR_Negro_mujeres = matriz_Negro[1][0]/(matriz_Negro[1][0]+matriz_Negro[1][1])
+FNR_Negro_hombre = matriz_Negro[1][0] / (matriz_Negro[1][0] + matriz_Negro[0][0])
+FNR_Negro_mujeres = matriz_Negro[0][1] / (matriz_Negro[1][0] + matriz_Negro[1][1])
 FNR_Negro = [FNR_Negro_hombre, FNR_Negro_mujeres]
 
-FNR_Asiatico_hombre = matriz_Asiatico[1][0]/(matriz_Asiatico[1][0]+matriz_Asiatico[0][0])
-FNR_Asiatico_mujeres = matriz_Asiatico[1][0]/(matriz_Asiatico[1][0]+matriz_Asiatico[1][1])
+FNR_Asiatico_hombre = matriz_Asiatico[1][0] / (matriz_Asiatico[1][0] + matriz_Asiatico[0][0])
+FNR_Asiatico_mujeres = matriz_Asiatico[0][1] / (matriz_Asiatico[1][0] + matriz_Asiatico[1][1])
 FNR_Asiatico = [FNR_Asiatico_hombre, FNR_Asiatico_mujeres]
 
-FNR_Indio_hombre = matriz_Indio[1][0]/(matriz_Indio[1][0]+matriz_Indio[0][0])
-FNR_Indio_mujeres = matriz_Indio[1][0]/(matriz_Indio[1][0]+matriz_Indio[1][1])
+FNR_Indio_hombre = matriz_Indio[1][0] / (matriz_Indio[1][0] + matriz_Indio[0][0])
+FNR_Indio_mujeres = matriz_Indio[0][1] / (matriz_Indio[1][0] + matriz_Indio[1][1])
 FNR_Indio = [FNR_Indio_hombre, FNR_Indio_mujeres]
 
-FNR_Total = [FNR_Blancos_hombre, FNR_Blancos_mujeres, FNR_Negro_hombre, FNR_Negro_mujeres, FNR_Asiatico_hombre, FNR_Asiatico_mujeres, FNR_Indio_hombre, FNR_Indio_mujeres]
+FNR_Total = [FNR_Blancos_hombre, FNR_Blancos_mujeres, FNR_Negro_hombre, FNR_Negro_mujeres, FNR_Asiatico_hombre,
+             FNR_Asiatico_mujeres, FNR_Indio_hombre, FNR_Indio_mujeres]
 
 x = np.arange(8)
 fig, ax = plt.subplots()
 plt.bar(x, FNR_Total)
-plt.xticks(x, ('FNR_Blancos_hombre', 'FNR_Blancos_mujeres', 'FNR_Negro_hombre', 'FNR_Negro_mujeres', 'FNR_Asiatico_hombre', 'FNR_Asiatico_mujeres', 'FNR_Indio_hombre', 'FNR_Indio_mujeres'))
+plt.xticks(x, (
+'FNR_Blancos_hombre', 'FNR_Blancos_mujeres', 'FNR_Negro_hombre', 'FNR_Negro_mujeres', 'FNR_Asiatico_hombre',
+'FNR_Asiatico_mujeres', 'FNR_Indio_hombre', 'FNR_Indio_mujeres'))
 plt.xticks(rotation=45)
 plt.show()
 
@@ -741,4 +718,231 @@ with sess.as_default():
     print('MATRIZ NORMALIZADA Asiaticos: \n', matriz_Asiatico_norm)
     print('MATRIZ NORMALIZADA Indios: \n', matriz_Indio_norm)
     print('MATRIZ NORMALIZADA Otros: \n', matriz_Otro_norm)
+
+# In[2]:
+
+
+pe_blanco = []
+pe_negro = []
+pe_asiatico = []
+pe_indio = []
+pe_otro = []
+vec = vec[1:]
+for i in range(46):
+    i = i + 14
+    matriz_Blanco = np.zeros((2, 2))
+    matriz_Negro = np.zeros((2, 2))
+    matriz_Asiatico = np.zeros((2, 2))
+    matriz_Indio = np.zeros((2, 2))
+    matriz_Otro = np.zeros((2, 2))
+    for muestra in vec:
+        if float(muestra[1]) == i:
+            if muestra[0] == '0.0':
+                if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
+                    matriz_Blanco[0][0] += 1
+                if (muestra[2] == '0.0') & (muestra[3] == '1.0'):
+                    matriz_Blanco[1][0] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '0.0'):
+                    matriz_Blanco[0][1] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '1.0'):
+                    matriz_Blanco[1][1] += 1
+
+            if muestra[0] == '1.0':
+                if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
+                    matriz_Negro[0][0] += 1
+                if (muestra[2] == '0.0') & (muestra[3] == '1.0'):
+                    matriz_Negro[1][0] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '0.0'):
+                    matriz_Negro[0][1] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '1.0'):
+                    matriz_Negro[1][1] += 1
+
+            if muestra[0] == '2.0':
+                if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
+                    matriz_Asiatico[0][0] += 1
+                if (muestra[2] == '0.0') & (muestra[3] == '1.0'):
+                    matriz_Asiatico[1][0] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '0.0'):
+                    matriz_Asiatico[0][1] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '1.0'):
+                    matriz_Asiatico[1][1] += 1
+
+            if muestra[0] == '3.0':
+                if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
+                    matriz_Indio[0][0] += 1
+                if (muestra[2] == '0.0') & (muestra[3] == '1.0'):
+                    matriz_Indio[1][0] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '0.0'):
+                    matriz_Indio[0][1] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '1.0'):
+                    matriz_Indio[1][1] += 1
+
+            if muestra[0] == '4.0':
+                if (muestra[2] == '0.0') & (muestra[3] == '0.0'):
+                    matriz_Otro[0][0] += 1
+                if (muestra[2] == '0.0') & (muestra[3] == '1.0'):
+                    matriz_Otro[1][0] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '0.0'):
+                    matriz_Otro[0][1] += 1
+                if (muestra[2] == '1.0') & (muestra[3] == '1.0'):
+                    matriz_Otro[1][1] += 1
+    pe_blanco.append(matriz_Blanco)
+    pe_negro.append(matriz_Negro)
+    pe_asiatico.append(matriz_Asiatico)
+    pe_indio.append(matriz_Indio)
+    pe_otro.append(matriz_Otro)
+pe_blanco = np.array(pe_blanco)
+pe_blanco.shape
+
+# In[37]:
+
+
+edades = []
+for i in range(46):
+    edades.append(i + 14)
+FNR_blancosh = []
+FNR_negrosh = []
+FNR_asiaticosh = []
+FNR_indiosh = []
+FNR_otrosh = []
+FNR_blancosm = []
+FNR_negrosm = []
+FNR_asiaticosm = []
+FNR_indiosm = []
+FNR_otrosm = []
+# False Negative Rate
+for i in range(46):
+    i = i + 14
+    FNR_Blancos_hombre = pe_blanco[i - 14][1][0] / (pe_blanco[i - 14][1][0] + pe_blanco[i - 14][0][0])
+
+    FNR_Blancos_mujeres = pe_blanco[i - 14][1][0] / (pe_blanco[i - 14][1][0] + pe_blanco[i - 14][1][1])
+    FNR_Blancos = [FNR_Blancos_hombre, FNR_Blancos_mujeres]
+
+    FNR_Negro_hombre = pe_negro[i - 14][1][0] / (pe_negro[i - 14][1][0] + pe_negro[i - 14][0][0])
+    FNR_Negro_mujeres = pe_negro[i - 14][1][0] / (pe_negro[i - 14][1][0] + pe_negro[i - 14][1][1])
+    FNR_Negro = [FNR_Negro_hombre, FNR_Negro_mujeres]
+
+    FNR_Asiatico_hombre = pe_asiatico[i - 14][1][0] / (pe_asiatico[i - 14][1][0] + pe_asiatico[i - 14][0][0])
+    FNR_Asiatico_mujeres = pe_asiatico[i - 14][1][0] / (pe_asiatico[i - 14][1][0] + pe_asiatico[i - 14][1][1])
+    FNR_Asiatico = [FNR_Asiatico_hombre, FNR_Asiatico_mujeres]
+
+    FNR_Indio_hombre = pe_indio[i - 14][1][0] / (pe_indio[i - 14][1][0] + pe_indio[i - 14][0][0])
+    FNR_Indio_mujeres = pe_indio[i - 14][1][0] / (pe_indio[i - 14][1][0] + pe_indio[i - 14][1][1])
+    FNR_Indio = [FNR_Indio_hombre, FNR_Indio_mujeres]
+
+    FNR_Otro_hombre = pe_otro[i - 14][1][0] / (pe_otro[i - 14][1][0] + pe_otro[i - 14][0][0])
+    FNR_Otro_mujeres = pe_otro[i - 14][1][0] / (pe_otro[i - 14][1][0] + pe_otro[i - 14][1][1])
+
+    FNR_blancosh.append(FNR_Blancos_hombre)
+    FNR_negrosh.append(FNR_Negro_hombre)
+    FNR_asiaticosh.append(FNR_Asiatico_hombre)
+    FNR_indiosh.append(FNR_Indio_hombre)
+    FNR_otrosh.append(FNR_Otro_hombre)
+    FNR_blancosm.append(FNR_Blancos_mujeres)
+    FNR_negrosm.append(FNR_Negro_mujeres)
+    FNR_asiaticosm.append(FNR_Asiatico_mujeres)
+    FNR_indiosm.append(FNR_Indio_mujeres)
+    FNR_otrosm.append(FNR_Otro_mujeres)
+
+for i in FNR_blancosh:
+    if math.isnan(i):
+        i = 1.5
+for i in range(46):
+    if math.isnan(FNR_blancosh[i]):
+        FNR_blancosh[i] = 1.5
+    if math.isnan(FNR_negrosh[i]):
+        FNR_negrosh[i] = 1.5
+    if math.isnan(FNR_asiaticosh[i]):
+        FNR_asiaticosh[i] = 1.5
+    if math.isnan(FNR_indiosh[i]):
+        FNR_indiosh[i] = 1.5
+    if math.isnan(FNR_otrosh[i]):
+        FNR_otrosh[i] = 1.5
+    if math.isnan(FNR_blancosm[i]):
+        FNR_blancosm[i] = 1.5
+    if math.isnan(FNR_negrosm[i]):
+        FNR_negrosm[i] = 1.5
+    if math.isnan(FNR_asiaticosm[i]):
+        FNR_asiaticosm[i] = 1.5
+    if math.isnan(FNR_indiosm[i]):
+        FNR_indiosm[i] = 1.5
+    if math.isnan(FNR_otrosm[i]):
+        FNR_otrosm[i] = 1.5
+plt.plot(edades, FNR_blancosh, label="hombres blancos", linestyle="-", marker=".")
+# plt.plot(FNR_negrosh,label="hombres negros",linestyle="-",marker=".")
+# plt.plot(FNR_asiaticosh,label="hombres asiaticos",linestyle="-",marker=".")
+# plt.plot(FNR_indiosh,label="hombres indios",linestyle="-",marker=".")
+# plt.plot(FNR_otrosh,label="hombres de otra raza",linestyle="-",marker=".")
+plt.plot(edades, FNR_blancosm, label="mujeres blancas", linestyle=":", marker=".")
+# plt.plot(FNR_negrosm,label="mujeres negras",linestyle=":",marker=".")
+# plt.plot(FNR_asiaticosm,label="mujeres asiaticas",linestyle=":",marker=".")
+# plt.plot(FNR_indiosm,label="mujeres indias",linestyle=":",marker=".")
+# plt.plot(FNR_otrosm,label="mujeres de otra raza",linestyle=":",marker=".")
+plt.ylabel('FNR')
+plt.xlabel('Edad')
+plt.title('False Negative Rate por edad de ambos sexos, para otras razas')
+plt.legend()
+plt.show()
+
+# In[29]:
+
+
+ACC_blancos = []
+ACC_negros = []
+ACC_asiaticos = []
+ACC_indios = []
+ACC_otros = []
+# Accuracy
+for i in range(46):
+    i = i + 14
+    ACC_Blancos = (pe_blanco[i - 14][1][1] + pe_blanco[i - 14][0][0]) / (pe_blanco[i - 14][1][1] +
+                                                                         pe_blanco[i - 14][0][1] + pe_blanco[i - 14][1][
+                                                                             0] + pe_blanco[i - 14][0][0])
+
+    ACC_Negros = (pe_negro[i - 14][1][1] + pe_negro[i - 14][0][0]) / (pe_negro[i - 14][1][1] +
+                                                                      pe_negro[i - 14][0][1] + pe_negro[i - 14][1][0] +
+                                                                      pe_negro[i - 14][0][0])
+
+    ACC_Asiaticos = (pe_asiatico[i - 14][1][1] + pe_asiatico[i - 14][0][0]) / (
+                pe_asiatico[i - 14][1][1] + pe_asiatico[i - 14][0][1]
+                + pe_asiatico[i - 14][1][0] + pe_asiatico[i - 14][0][0])
+
+    ACC_Indios = (pe_indio[i - 14][1][1] + pe_indio[i - 14][0][0]) / (pe_indio[i - 14][1][1] + pe_indio[i - 14][0][1]
+                                                                      + pe_indio[i - 14][1][0] + pe_indio[i - 14][0][0])
+
+    ACC_Otros = (pe_otro[i - 14][1][1] + pe_otro[i - 14][0][0]) / (pe_otro[i - 14][1][1] + pe_otro[i - 14][0][1]
+                                                                   + pe_otro[i - 14][1][0] + pe_otro[i - 14][0][0])
+
+    ACC_blancos.append(ACC_Blancos)
+    ACC_negros.append(ACC_Negros)
+    ACC_asiaticos.append(ACC_Asiaticos)
+    ACC_indios.append(ACC_Indios)
+    ACC_otros.append(ACC_Otros)
+
+for i in range(46):
+    if math.isnan(ACC_blancos[i]):
+        ACC_blancos[i] = 1.5
+    if math.isnan(ACC_negros[i]):
+        ACC_negros[i] = 1.5
+    if math.isnan(ACC_asiaticos[i]):
+        ACC_asiaticos[i] = 1.5
+    if math.isnan(ACC_indios[i]):
+        ACC_indios[i] = 1.5
+    if math.isnan(ACC_otros[i]):
+        ACC_otros[i] = 1.5
+plt.plot(edades, ACC_blancos, label="blancos", linestyle="-", marker=".")
+plt.plot(edades, ACC_negros, label="negros", linestyle=":", marker=".")
+# plt.plot(edades, ACC_asiaticos,label="asiaticos",linestyle="-",marker=".")
+# plt.plot(edades, ACC_indios,label="indios",linestyle=":",marker=".")
+# plt.plot(edades, ACC_otros,label="otra raza",linestyle="",marker=".")
+plt.ylabel('Accuracy')
+plt.xlabel('Edad')
+plt.title('Accuracy por edad')
+plt.legend()
+plt.show()
+
+# In[ ]:
+
+
+
 
