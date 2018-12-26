@@ -63,8 +63,8 @@ indio = 3
 otro = 4
 '''
 
-razamod = 2
-porcentaje = 0        # DE 1 A 100
+razamod = 0
+porcentaje = 20        # DE 0 A 100
 
 for i in range(imagenes.__len__()):
     if 14 <= int(filelist[i].split('_')[0].split('/')[1]) <= 59:
@@ -138,15 +138,14 @@ for ident in range(genero.__len__()):
             m_otros[e] += 1
 
 
-print(sum(h_negros)+sum(m_negros))
+print('Muestras Totales: ' + str(sum(h_blancos)+sum(h_negros)+sum(h_asiaticos)+sum(h_indios)+sum(h_otros)+
+      sum(m_blancos)+sum(m_negros)+sum(m_asiaticos)+sum(m_indios)+sum(m_otros)))
 # PLOT DESCRIPCION CONJUNTO DEL TEST (FALTA EL TOTAL)
 
 # ARREGLAR
 
 menMeans = [sum(h_blancos), sum(h_negros), sum(h_asiaticos), sum(h_indios), sum(h_otros)]
 womenMeans = [sum(m_blancos), sum(m_negros), sum(m_asiaticos), sum(m_indios), sum(m_otros)]
-print(menMeans)
-print(womenMeans)
 
 ind = [0, 2000, 4000, 6000, 8000]  # the x locations for the groups
 width = 1000  # the width of the bars: can also be len(x) sequence

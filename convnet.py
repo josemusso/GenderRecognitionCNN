@@ -388,7 +388,7 @@ print("Trainable variables")
 for n in tf.trainable_variables():
     print(n.name)
 if use_convnet:
-    epochs = 10
+    epochs = 80
 else:
     epochs = 50
 
@@ -402,7 +402,7 @@ test_acc_vals2 = []
 test_acc_vals3 = []
 test_acc_vals4 = []
 
-hist_loss = [1.0]
+hist_loss = [1.0, 1.0, 1.0]
 patience_cnt = 0
 
 while cifar10.getEpoch() < epochs:
@@ -460,16 +460,17 @@ while cifar10.getEpoch() < epochs:
         # IMPLEMENTACION EARLY STOPPING
 
         hist_loss.append(validation_loss)
-        patience = 5
+        patience = 3
         min_delta = 0.001
 
-        if epoch > 0 and hist_loss[epoch - 1] - hist_loss[epoch] > min_delta:
+        if min([hist_loss[epoch+2], hist_loss[epoch+1], hist_loss[epoch]]) > hist_loss[epoch+3]:
             patience_cnt = 0
         else:
             patience_cnt += 1
+        print(hist_loss)
         print('Early Stopping checks: %d/%d' %
               (patience_cnt, patience))
-        if patience_cnt > patience:
+        if patience_cnt == patience:
             print("Early Stopping Activado")
             break
 
@@ -705,7 +706,7 @@ plt.show()
 
 with sess.as_default():
     np.set_printoptions(threshold=np.nan)
-    print('Vector Confusion: \n', vec)
+    # print('Vector Confusion: \n', vec)                            DESCOMENTAR LINEA PARA ENTREGA
     # print('Confusion Matrix de Blancos: \n', matsum0)
     # print('Confusion Matrix de Negros: \n', matsum1)
     # print('Confusion Matrix de Asiaticos: \n', matsum2)
@@ -941,8 +942,7 @@ plt.title('Accuracy por edad')
 plt.legend()
 plt.show()
 
-# In[ ]:
-
+print([ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio])
 
 
 
