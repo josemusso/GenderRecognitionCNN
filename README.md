@@ -5,9 +5,25 @@ Tema: Sesgos Etnicos en Clasificadores de Rostros
 Integrantes: Jorge Fabry y Jose Ignacio Musso
 
 
-Etiquetas:
-Raza: http://www.cs.columbia.edu/CAVE/databases/pubfig/download/lfw_attributes.txt
-Genero: https://www.dropbox.com/sh/l3ezp9qyy5hid80/AAAjK6HdDScd_1rXASlsmELla?dl=0
+La red consta de tres archivos principales: importar_imagenes.py, cifar10mod.py y convnet.py
 
-Para poder correr el codigo se deben tener todos los archivos del repositorio en una carpeta, dentro de esta carpeta se debe agregar la carpeta Etiquetas, la cual se puede obtener desde el drive del proyecto (https://drive.google.com/open?id=1fyzaMYMVn1mB_INqFhuZSuU8OoKns7rC). Los datos generados por el archivo importar imagenes.py deben ser introducidos a una carpeta llamada datos, la cual se encuentra dentro de la carpeta del proyecto, junto al resto de los archivos. Si no se tiene la intención de correr el procesamiento de imagenes se pueden usar los datos presentes en el drive.
+importar_imagenes.py: 
 
+Cumple la funcion de recibir los archivos de imagenes del dataset UTKFace y las comprime en 4 archivos de tipo pkl que seran usados por cifar10mod para alimentar la red. En las lineas 66 y 67 se encuentran las variables razamod y porcentaje, estas sirven para crear un desbalance en el dataset a comprimir e.g. razamod=1 y porcentaje=50 el dataset resultante tendra una presencia de raza Negros de solo un 50%.
+
+cifar10mod.py:
+
+Este archivo es ejecutado por convnet.py, no sirve ejecutarlo solo. En la linea 32 esta la variable DIR_BINARIES que debe especificar la carpeta donde se encuentran los archivos pkl generados por importar_imagenes.py
+
+convnet.py:
+
+Este archivo contiene la red convolucional. Tiene todo listo para llegar y ejecutar.
+
+INSTRUCCIONES DE USO:
+
+1.  Descargar la base de datos UTKFace del siguiente link: https://drive.google.com/file/d/1xt1jX7Csq--6lxi7X7vOTyyTN6lj0eq6/view?usp=sharing
+2.  Descomprimir el .zip y colocar la carpeta UTKFace en la carpeta donde se encuentran los tres archivos principales del           programa
+3.  Ejecutar importar_imagenes.py para generar los archivos .pkl.
+4.  Colocar los archivos .pkl dentro de una nueva carpeta Datos/
+5.  Ejecutar convnet.py para comenzar el entrenamiento
+6.  Fianlmente se imprimen las matrices de confusion correspondientes en consola y numerosas figuras informativas
