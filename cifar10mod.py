@@ -29,7 +29,7 @@ from sklearn.model_selection import train_test_split
 # In[ ]:
 
 # SE CAMBIO LA DIRECCION POR LA DE CARPETA DE DESBALANCe
-DIR_BINARIES = 'Datos_desb/asiaticos_20/'
+DIR_BINARIES = 'Datos/'
 print(DIR_BINARIES)
 
 def unpickle(filename):

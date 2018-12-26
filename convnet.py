@@ -13,6 +13,8 @@ import time
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+from collections import namedtuple
 
 # %matplotlib inline
 import tensorflow as tf
@@ -388,7 +390,7 @@ print("Trainable variables")
 for n in tf.trainable_variables():
     print(n.name)
 if use_convnet:
-    epochs = 80
+    epochs = 40
 else:
     epochs = 50
 
@@ -706,7 +708,7 @@ plt.show()
 
 with sess.as_default():
     np.set_printoptions(threshold=np.nan)
-    # print('Vector Confusion: \n', vec)                            DESCOMENTAR LINEA PARA ENTREGA
+    print('Vector Confusion: \n', vec)                           # DESCOMENTAR LINEA PARA ENTREGA
     # print('Confusion Matrix de Blancos: \n', matsum0)
     # print('Confusion Matrix de Negros: \n', matsum1)
     # print('Confusion Matrix de Asiaticos: \n', matsum2)
@@ -720,7 +722,7 @@ with sess.as_default():
     print('MATRIZ NORMALIZADA Indios: \n', matriz_Indio_norm)
     print('MATRIZ NORMALIZADA Otros: \n', matriz_Otro_norm)
 
-# In[2]:
+# A CONTINUACION ES PARA GRAFICAR POR EDAD
 
 
 pe_blanco = []
@@ -793,12 +795,47 @@ for i in range(46):
     pe_indio.append(matriz_Indio)
     pe_otro.append(matriz_Otro)
 pe_blanco = np.array(pe_blanco)
-pe_blanco.shape
 
-# In[37]:
+
+def por_rango(ACC_blancos, nblancos, ACC_blancosn, std):
+    std[0] = np.std(ACC_blancos[0:9])
+    std[1] = np.std(ACC_blancos[10:19])
+    std[2] = np.std(ACC_blancos[20:29])
+    std[3] = np.std(ACC_blancos[30:39])
+    std[4] = np.std(ACC_blancos[40:46])
+    for i in range(10):
+        if math.isnan(ACC_blancos[i]):
+            nblancos[0] = nblancos[0]
+        else:
+            ACC_blancosn[0] = ACC_blancos[i] + ACC_blancosn[0]
+            nblancos[0] = nblancos[0] + 1
+        if math.isnan(ACC_blancos[i + 10]):
+            nblancos[1] = nblancos[1]
+        else:
+            ACC_blancosn[1] = ACC_blancos[i + 10] + ACC_blancosn[1]
+            nblancos[1] = nblancos[1] + 1
+        if math.isnan(ACC_blancos[i + 20]):
+            nblancos[2] = nblancos[2]
+        else:
+            ACC_blancosn[2] = ACC_blancos[i + 20] + ACC_blancosn[2]
+            nblancos[2] = nblancos[2] + 1
+        if math.isnan(ACC_blancos[i + 30]):
+            nblancos[3] = nblancos[3]
+        else:
+            ACC_blancosn[3] = ACC_blancos[i + 30] + ACC_blancosn[3]
+            nblancos[3] = nblancos[3] + 1
+    for i in range(6):
+        if math.isnan(ACC_blancos[i + 20]):
+            nblancos[4] = nblancos[4]
+        else:
+            ACC_blancosn[4] = ACC_blancos[i + 20] + ACC_blancosn[4]
+            nblancos[4] = nblancos[4] + 1
+    for i in range(5):
+        ACC_blancosn[i] = ACC_blancosn[i] / nblancos[i]
 
 
 edades = []
+
 for i in range(46):
     edades.append(i + 14)
 FNR_blancosh = []
@@ -811,6 +848,7 @@ FNR_negrosm = []
 FNR_asiaticosm = []
 FNR_indiosm = []
 FNR_otrosm = []
+
 # False Negative Rate
 for i in range(46):
     i = i + 14
@@ -845,48 +883,135 @@ for i in range(46):
     FNR_indiosm.append(FNR_Indio_mujeres)
     FNR_otrosm.append(FNR_Otro_mujeres)
 
-for i in FNR_blancosh:
-    if math.isnan(i):
-        i = 1.5
-for i in range(46):
-    if math.isnan(FNR_blancosh[i]):
-        FNR_blancosh[i] = 1.5
-    if math.isnan(FNR_negrosh[i]):
-        FNR_negrosh[i] = 1.5
-    if math.isnan(FNR_asiaticosh[i]):
-        FNR_asiaticosh[i] = 1.5
-    if math.isnan(FNR_indiosh[i]):
-        FNR_indiosh[i] = 1.5
-    if math.isnan(FNR_otrosh[i]):
-        FNR_otrosh[i] = 1.5
-    if math.isnan(FNR_blancosm[i]):
-        FNR_blancosm[i] = 1.5
-    if math.isnan(FNR_negrosm[i]):
-        FNR_negrosm[i] = 1.5
-    if math.isnan(FNR_asiaticosm[i]):
-        FNR_asiaticosm[i] = 1.5
-    if math.isnan(FNR_indiosm[i]):
-        FNR_indiosm[i] = 1.5
-    if math.isnan(FNR_otrosm[i]):
-        FNR_otrosm[i] = 1.5
-plt.plot(edades, FNR_blancosh, label="hombres blancos", linestyle="-", marker=".")
-# plt.plot(FNR_negrosh,label="hombres negros",linestyle="-",marker=".")
-# plt.plot(FNR_asiaticosh,label="hombres asiaticos",linestyle="-",marker=".")
-# plt.plot(FNR_indiosh,label="hombres indios",linestyle="-",marker=".")
-# plt.plot(FNR_otrosh,label="hombres de otra raza",linestyle="-",marker=".")
-plt.plot(edades, FNR_blancosm, label="mujeres blancas", linestyle=":", marker=".")
-# plt.plot(FNR_negrosm,label="mujeres negras",linestyle=":",marker=".")
-# plt.plot(FNR_asiaticosm,label="mujeres asiaticas",linestyle=":",marker=".")
-# plt.plot(FNR_indiosm,label="mujeres indias",linestyle=":",marker=".")
-# plt.plot(FNR_otrosm,label="mujeres de otra raza",linestyle=":",marker=".")
-plt.ylabel('FNR')
-plt.xlabel('Edad')
-plt.title('False Negative Rate por edad de ambos sexos, para otras razas')
-plt.legend()
+FNR_blancosnh = [0, 0, 0, 0, 0]
+nblancosh = [0, 0, 0, 0, 0]
+std_blanh = [0, 0, 0, 0, 0]
+por_rango(FNR_blancosh, nblancosh, FNR_blancosnh, std_blanh)
+FNR_negrosnh = [0, 0, 0, 0, 0]
+nnegrosh = [0, 0, 0, 0, 0]
+std_negh = [0, 0, 0, 0, 0]
+por_rango(FNR_negrosh, nnegrosh, FNR_negrosnh, std_negh)
+FNR_asiaticosnh = [0, 0, 0, 0, 0]
+nasiaticosh = [0, 0, 0, 0, 0]
+std_asiah = [0, 0, 0, 0, 0]
+por_rango(FNR_asiaticosh, nasiaticosh, FNR_asiaticosnh, std_asiah)
+FNR_indiosnh = [0, 0, 0, 0, 0]
+nindiosh = [0, 0, 0, 0, 0]
+std_indh = [0, 0, 0, 0, 0]
+por_rango(FNR_indiosh, nindiosh, FNR_indiosnh, std_indh)
+FNR_otrosnh = [0, 0, 0, 0, 0]
+notrosh = [0, 0, 0, 0, 0]
+std_oth = [0, 0, 0, 0, 0]
+por_rango(FNR_otrosh, notrosh, FNR_otrosnh, std_oth)
+
+FNR_blancosnm = [0, 0, 0, 0, 0]
+nblancosm = [0, 0, 0, 0, 0]
+std_blanm = [0, 0, 0, 0, 0]
+por_rango(FNR_blancosm, nblancosm, FNR_blancosnm, std_blanm)
+FNR_negrosnm = [0, 0, 0, 0, 0]
+nnegrosm = [0, 0, 0, 0, 0]
+std_negm = [0, 0, 0, 0, 0]
+por_rango(FNR_negrosm, nnegrosm, FNR_negrosnm, std_negm)
+FNR_asiaticosnm = [0, 0, 0, 0, 0]
+nasiaticosm = [0, 0, 0, 0, 0]
+std_asiam = [0, 0, 0, 0, 0]
+por_rango(FNR_asiaticosm, nasiaticosm, FNR_asiaticosnm, std_asiam)
+FNR_indiosnm = [0, 0, 0, 0, 0]
+nindiosm = [0, 0, 0, 0, 0]
+std_indm = [0, 0, 0, 0, 0]
+por_rango(FNR_indiosm, nindiosm, FNR_indiosnm, std_indm)
+FNR_otrosnm = [0, 0, 0, 0, 0]
+notrosm = [0, 0, 0, 0, 0]
+std_otm = [0, 0, 0, 0, 0]
+por_rango(FNR_otrosm, notrosm, FNR_otrosnm, std_otm)
+
+# PLOT GRAFICOS POR EDAD
+
+n_groups = 5
+fig, ax = plt.subplots()
+
+index = np.arange(n_groups)
+bar_width = 0.1
+
+opacity = 0.4
+error_config = {'ecolor': '0.3'}
+
+rects1 = ax.bar(index, FNR_blancosnh, bar_width,
+                alpha=opacity, color='b',
+                yerr=std_blanh, error_kw=error_config,
+                label='Blancos')
+
+rects2 = ax.bar(index + bar_width, FNR_negrosnh, bar_width,
+                alpha=opacity, color='r',
+                yerr=std_negh, error_kw=error_config,
+                label='Negros')
+rects3 = ax.bar(index + bar_width+ bar_width, FNR_asiaticosnh, bar_width,
+                alpha=opacity, color='g',
+                yerr=std_asiah, error_kw=error_config,
+                label='Asiaticos')
+rects4 = ax.bar(index + bar_width+ bar_width+ bar_width, FNR_indiosnh, bar_width,
+                alpha=opacity, color='c',
+                yerr=std_indh, error_kw=error_config,
+                label='Indios')
+rects5 = ax.bar(index + bar_width+ bar_width+ bar_width+ bar_width, FNR_otrosnh, bar_width,
+                alpha=opacity, color='k',
+                yerr=std_oth, error_kw=error_config,
+                label='Otros')
+
+ax.set_xlabel('Grupo etario')
+ax.set_ylabel('False Negative Rate')
+ax.set_title('Ratio de falsos positivos de hombres por raza y Grupo etario')
+ax.set_xticks(index + (bar_width+ bar_width) / 2)
+ax.set_xticklabels(("14-23","24-33","34-43", "44-54","53-60"))
+ax.legend( loc=1)
+
+fig.tight_layout()
 plt.show()
 
-# In[29]:
+# OTRO GRAFICO
 
+n_groups = 5
+fig, ax = plt.subplots()
+
+index = np.arange(n_groups)
+bar_width = 0.1
+
+opacity = 0.4
+error_config = {'ecolor': '0.3'}
+
+rects1 = ax.bar(index, FNR_blancosnm, bar_width,
+                alpha=opacity, color='b',
+                yerr=std_blanm, error_kw=error_config,
+                label='Blancos')
+
+rects2 = ax.bar(index + bar_width, FNR_negrosnm, bar_width,
+                alpha=opacity, color='r',
+                yerr=std_negm, error_kw=error_config,
+                label='Negros')
+rects3 = ax.bar(index + bar_width+ bar_width, FNR_asiaticosnm, bar_width,
+                alpha=opacity, color='g',
+                yerr=std_asiam, error_kw=error_config,
+                label='Asiaticos')
+rects4 = ax.bar(index + bar_width+ bar_width+ bar_width, FNR_indiosnm, bar_width,
+                alpha=opacity, color='c',
+                yerr=std_indm, error_kw=error_config,
+                label='Indios')
+rects5 = ax.bar(index + bar_width+ bar_width+ bar_width+ bar_width, FNR_otrosnm, bar_width,
+                alpha=opacity, color='k',
+                yerr=std_otm, error_kw=error_config,
+                label='Otros')
+
+ax.set_xlabel('Grupo etario')
+ax.set_ylabel('False Negative Rate')
+ax.set_title('Ratio de falsos positivos de mujeres por raza y Grupo etario')
+ax.set_xticks(index + (bar_width+ bar_width) / 2)
+ax.set_xticklabels(("14-23","24-33","34-43", "44-54","53-60"))
+ax.legend( loc=2)
+
+fig.tight_layout()
+plt.show()
+
+# OTRO
 
 ACC_blancos = []
 ACC_negros = []
@@ -920,26 +1045,66 @@ for i in range(46):
     ACC_indios.append(ACC_Indios)
     ACC_otros.append(ACC_Otros)
 
-for i in range(46):
-    if math.isnan(ACC_blancos[i]):
-        ACC_blancos[i] = 1.5
-    if math.isnan(ACC_negros[i]):
-        ACC_negros[i] = 1.5
-    if math.isnan(ACC_asiaticos[i]):
-        ACC_asiaticos[i] = 1.5
-    if math.isnan(ACC_indios[i]):
-        ACC_indios[i] = 1.5
-    if math.isnan(ACC_otros[i]):
-        ACC_otros[i] = 1.5
-plt.plot(edades, ACC_blancos, label="blancos", linestyle="-", marker=".")
-plt.plot(edades, ACC_negros, label="negros", linestyle=":", marker=".")
-# plt.plot(edades, ACC_asiaticos,label="asiaticos",linestyle="-",marker=".")
-# plt.plot(edades, ACC_indios,label="indios",linestyle=":",marker=".")
-# plt.plot(edades, ACC_otros,label="otra raza",linestyle="",marker=".")
-plt.ylabel('Accuracy')
-plt.xlabel('Edad')
-plt.title('Accuracy por edad')
-plt.legend()
+ACC_blancosn = [0, 0, 0, 0, 0]
+nblancos = [0, 0, 0, 0, 0]
+std_blan = [0, 0, 0, 0, 0]
+por_rango(ACC_blancos, nblancos, ACC_blancosn, std_blan)
+ACC_negrosn = [0, 0, 0, 0, 0]
+nnegros = [0, 0, 0, 0, 0]
+std_neg = [0, 0, 0, 0, 0]
+por_rango(ACC_negros, nnegros, ACC_negrosn, std_neg)
+ACC_asiaticosn = [0, 0, 0, 0, 0]
+nasiaticos = [0, 0, 0, 0, 0]
+std_asia = [0, 0, 0, 0, 0]
+por_rango(ACC_asiaticos, nasiaticos, ACC_asiaticosn, std_asia)
+ACC_indiosn = [0, 0, 0, 0, 0]
+nindios = [0, 0, 0, 0, 0]
+std_ind = [0, 0, 0, 0, 0]
+por_rango(ACC_indios, nindios, ACC_indiosn, std_ind)
+ACC_otrosn = [0, 0, 0, 0, 0]
+notros = [0, 0, 0, 0, 0]
+std_ot = [0, 0, 0, 0, 0]
+por_rango(ACC_otros, notros, ACC_otrosn, std_ot)
+
+n_groups = 5
+fig, ax = plt.subplots()
+
+index = np.arange(n_groups)
+bar_width = 0.1
+
+opacity = 0.4
+error_config = {'ecolor': '0.3'}
+
+rects1 = ax.bar(index, ACC_blancosn, bar_width,
+                alpha=opacity, color='b',
+                yerr=std_blan, error_kw=error_config,
+                label='Blancos')
+
+rects2 = ax.bar(index + bar_width, ACC_negrosn, bar_width,
+                alpha=opacity, color='r',
+                yerr=std_neg, error_kw=error_config,
+                label='Negros')
+rects3 = ax.bar(index + bar_width+ bar_width, ACC_asiaticosn, bar_width,
+                alpha=opacity, color='g',
+                yerr=std_asia, error_kw=error_config,
+                label='Asiaticos')
+rects4 = ax.bar(index + bar_width+ bar_width+ bar_width, ACC_indiosn, bar_width,
+                alpha=opacity, color='c',
+                yerr=std_ind, error_kw=error_config,
+                label='Indios')
+rects5 = ax.bar(index + bar_width+ bar_width+ bar_width+ bar_width, ACC_otrosn, bar_width,
+                alpha=opacity, color='k',
+                yerr=std_ot, error_kw=error_config,
+                label='Asiaticos')
+
+ax.set_xlabel('Grupo etario')
+ax.set_ylabel('Accuracy')
+ax.set_title('Accuracy de raza por grupo etario')
+ax.set_xticks(index + (bar_width+ bar_width) / 2)
+ax.set_xticklabels(("14-23","24-33","34-43", "44-54","53-60"))
+ax.legend( loc=3)
+
+fig.tight_layout()
 plt.show()
 
 print([ACC_Blancos, ACC_Negro, ACC_Asiatico, ACC_Indio])

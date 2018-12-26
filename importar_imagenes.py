@@ -64,7 +64,7 @@ otro = 4
 '''
 
 razamod = 0
-porcentaje = 20        # DE 0 A 100
+porcentaje = 100        # DE 0 A 100
 
 for i in range(imagenes.__len__()):
     if 14 <= int(filelist[i].split('_')[0].split('/')[1]) <= 59:
