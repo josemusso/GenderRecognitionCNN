@@ -21,6 +21,8 @@ Este archivo contiene la red convolucional. Tiene todo listo para llegar y ejecu
 
 INSTRUCCIONES DE USO:
 
+**SI SE TIENEN SOLO 8GB DE RAM SE RECOMIENDA CERRAR TODO (INCLUIDO CHROME) PARA EVITAR MEMORY ERROR**
+
 1.  Descargar la base de datos UTKFace del siguiente link: https://drive.google.com/file/d/1xt1jX7Csq--6lxi7X7vOTyyTN6lj0eq6/view?usp=sharing
 2.  Descomprimir el .zip y colocar la carpeta UTKFace en la carpeta donde se encuentran los tres archivos principales del           programa
 3.  Ejecutar importar_imagenes.py para generar los archivos .pkl.
