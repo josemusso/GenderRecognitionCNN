@@ -7,7 +7,7 @@ Integrantes: Jorge Fabry y Jose Ignacio Musso
 
 La red consta de tres archivos principales: importar_imagenes.py, cifar10mod.py y convnet.py
 
-**importar_imagenes.py: **
+**importar_imagenes.py:**
 
 Cumple la funcion de recibir los archivos de imagenes del dataset UTKFace y las comprime en 4 archivos de tipo pkl que seran usados por cifar10mod para alimentar la red. En las lineas 66 y 67 se encuentran las variables razamod y porcentaje, estas sirven para crear un desbalance en el dataset a comprimir e.g. razamod=1 y porcentaje=50 el dataset resultante tendra una presencia de raza Negros de solo un 50%.
 
