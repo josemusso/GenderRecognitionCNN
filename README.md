@@ -28,4 +28,4 @@ INSTRUCCIONES DE USO:
 3.  Ejecutar importar_imagenes.py para generar los archivos .pkl.
 4.  Colocar los archivos .pkl dentro de una nueva carpeta Datos/
 5.  Ejecutar convnet.py para comenzar el entrenamiento
-6.  Fianlmente se imprimen las matrices de confusion correspondientes en consola y numerosas figuras informativas
+6.  Finalmente se imprimen las matrices de confusion correspondientes en consola y numerosas figuras informativas
